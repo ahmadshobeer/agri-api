@@ -53,8 +53,12 @@ class AuthController extends Controller
                 'message' => 'Invalid Email / password'
             ], 401);
         }
+        $user = $request->user();
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Your email address is not verified.'], 403);
+        }
+     
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -63,7 +67,7 @@ class AuthController extends Controller
             'message' => 'Login success',
             'access_token' => $token,
             'token_type' => 'Bearer'
-        ]);
+        ]); 
     }
 
     public function logout()
