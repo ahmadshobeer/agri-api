@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 class AuthController extends Controller
 {
     //
@@ -30,13 +31,18 @@ class AuthController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+       event(new Registered($user));
+
+        return response()->json(['message' => 'User registered successfully. Please check your email to verify your account.'], 201);
+    
+
+        /* $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'data' => $user,
             'access_token' => $token,
             'token_type' => 'Bearer'
-        ]);
+        ]); */
     }
 
     public function login(Request $request)
